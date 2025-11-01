@@ -1,0 +1,51 @@
+name: 'run_cnCustom_py'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */4 18-25 * *'
+
+env:
+  retry: 3
+  repo_name: CECNdata/cnCustom_atp_prelim
+  repo_token: ${{ secrets.repo_token }}
+
+jobs:
+  release_day:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codes
+        uses: actions/checkout@v3
+        with:
+          repository: '${{ env.repo_name }}'
+           # `GH_PAT` is a secret that contains you PAT
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          cd .github
+          python -m pip install --upgrade pip
+          pip install fire
+          pip install pipreqs
+          pipreqs .
+          pip install -r requirements.txt
+
+      - name: Install Playwright
+        run: |
+            npx playwright install-deps firefox
+            python -m playwright install firefox
+
+      - name: check ip
+        run: |
+            curl ifconfig.me
+      - name: run customs download
+        continue-on-error: true
+        run: |
+           cp ./.github/*py ./
+           DEBUG=pw:api timeout 1800 xvfb-run python *py
