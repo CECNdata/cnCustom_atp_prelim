@@ -19,8 +19,8 @@ jobs:
       - name: Checkout codes
         uses: actions/checkout@v3
         with:
-          repository: '${{ env.repo_name  }}'
-          token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains you PAT
+          repository: '${{ env.repo_name }}'
+           # `GH_PAT` is a secret that contains you PAT
           ref: main
 
       - name: Login to GitHub Container Registry
