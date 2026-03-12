@@ -25,25 +25,35 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.11
 
       - name: Install dependencies
         run: |
           cd .github
           python -m pip install --upgrade pip
-          pip install fire
-          pip install pipreqs
-          pipreqs .
-          pip install -r requirements.txt
+          # 禁用root警告（CI环境下可接受）
+          pip install fire pipreqs --root-user-action=ignore
+          # 生成requirements.txt并清理冲突版本
+          pipreqs . --force --encoding=utf-8
+          # 移除冲突的playwright/numpy版本，写入兼容版本
+          sed -i '/playwright/d' requirements.txt
+          sed -i '/numpy/d' requirements.txt
+          echo "playwright==1.40.0" >> requirements.txt
+          echo "numpy==2.4.3" >> requirements.txt  # Python3.11兼容，若用3.10则改为2.2.6
+          # 安装依赖
+          pip install -r requirements.txt --root-user-action=ignore
 
       - name: Install Playwright
         run: |
-            npx playwright install-deps firefox
-            python -m playwright install firefox
+          # 安装Firefox系统依赖
+          npx playwright install-deps firefox
+          # Playwright 1.40.0不支持@版本号，直接安装默认绑定的121.0版本
+          python -m playwright install firefox
 
       - name: check ip
         run: |
             curl ifconfig.me
+            
       - name: run customs download
         continue-on-error: true
         run: |
