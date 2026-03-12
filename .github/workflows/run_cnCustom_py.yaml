@@ -49,6 +49,7 @@ jobs:
           npx playwright install-deps firefox
           # Playwright 1.40.0不支持@版本号，直接安装默认绑定的121.0版本
           python -m playwright install firefox
+          sudo playwright install-deps
 
       - name: check ip
         run: |
