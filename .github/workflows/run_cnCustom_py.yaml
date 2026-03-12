@@ -9,6 +9,7 @@ env:
   repo_name: CECNdata/cnCustom_atp_prelim
   repo_token: ${{ secrets.repo_token }}
   dl_path: ./.github/*py
+  docker_image: ghcr.io/cecndata/ga-sec:latest
   retry: 2
   
 
